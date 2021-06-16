@@ -1,38 +1,40 @@
-import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { connect } from "react-redux";
+import { getCountries } from "./actions";
 import "./App.css";
 
-function App() {
-  const [countries, setCountries] = useState([]);
-
+const App = (props) => {
   useEffect(() => {
-    axios
-      .get("https://restcountries.eu/rest/v2/all")
-      .then((response) => setCountries(response.data))
-      .catch((error) => console.log({ error }));
+    props.getCountries();
   }, []);
-
   return (
     <div className="App">
       <h1>React Dersleri</h1>
-      <h2>React Router</h2>
-      {countries.map((country) => {
-        return (
-          <div key={country.name}>
-            <h3>{country.name}</h3>
-            <h4>{country.capital}</h4>
-            <p>
-              <img
-                src={country.flag}
-                alt={country.name}
-                style={{ width: "100px" }}
-              />
-            </p>
-          </div>
-        );
-      })}
+      <h2>Redux-Thunk</h2>
+      {props.isLoading ? (
+        <p>...Loading....</p>
+      ) : (
+        props.countries.map((country) => {
+          return (
+            <div key={country.name}>
+              <h3>{country.name}</h3>
+              <h4>{country.capital}</h4>
+              <p>
+                <img
+                  src={country.flag}
+                  alt={country.name}
+                  style={{ width: "100px" }}
+                />
+              </p>
+            </div>
+          );
+        })
+      )}
     </div>
   );
-}
+};
 
-export default App;
+const mapStateToProps = (state) => {
+  return { countries: state.countries, isLoading: state.isLoading };
+};
+export default connect(mapStateToProps, { getCountries })(App);
